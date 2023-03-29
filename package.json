@@ -8,7 +8,8 @@
     "start": "node server",
     "dev": "nodemon server",
     "migrate": "knex migrate:latest",
-    "seed": "knex seed:run"
+    "seed": "knex seed:run",
+    "rollback": "knex migrate:rollback"
   },
   "keywords": [],
   "author": "",

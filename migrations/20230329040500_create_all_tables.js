@@ -2,14 +2,19 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.up = function (knex) {
+exports.up = async function (knex) {
   return knex.schema
+    .createTable("location", (table) => {
+      table.increments("location_id").primary().unsigned();
+      table.string("location_name").notNullable();
+    })
     .createTable("profile", (table) => {
-      table.uuid("profile_id").primary().defaultTo(knex.raw("(UUID())"));
+      table.increments("profile_id").primary();
       table.string("avatar_url").notNullable();
       table.string("name").notNullable();
       table.integer("age").notNullable();
       table.text("bio").notNullable();
+      table.integer("location").unsigned();
       table.timestamp("start_date").notNullable();
       table.timestamp("end_date").notNullable();
       table.boolean("isFriend").defaultTo(0);
@@ -21,15 +26,12 @@ exports.up = function (knex) {
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
-    .createTable("location", (table) => {
-      table.increments("location_id").primary();
-      table.string("location_name").notNullable();
-    })
     .createTable("event", (table) => {
-      table.uuid("event_id").primary().defaultTo(knex.raw("(UUID())"));
+      table.increments("event_id").primary();
       table.string("event_img_url").notNullable();
       table.string("name").notNullable();
       table.text("description").notNullable();
+      table.integer("location").unsigned();
       table.date("date").notNullable();
       table.boolean("isSaved").defaultTo(0);
       table
@@ -39,28 +41,33 @@ exports.up = function (knex) {
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
     })
-    .createTable("profile_event", (table) => {
-      table.increments("profile_event_id").primary();
-      table.integer("profile_id").references("profile_id").inTable("profile");
-      table.integer("event_id").references("event_id").inTable("event");
-    })
     .createTable("interest", (table) => {
       table.increments("interest_id").primary();
       table.string("interest_name").notNullable();
     })
+    .createTable("profile_event", (table) => {
+      table.increments("profile_event_id").primary();
+      table
+        .integer("profile_id")
+        .unsigned()
+        .references("profile_id")
+        .inTable("profile");
+      table
+        .integer("event_id")
+        .unsigned()
+        .references("event_id")
+        .inTable("event");
+    })
     .createTable("event_interest", (table) => {
       table.increments("event_interest_id").primary();
-      table.integer("event_id").references("event_id").inTable("event");
+      table
+        .integer("event_id")
+        .unsigned()
+        .references("event_id")
+        .inTable("event");
       table
         .integer("interest_id")
-        .references("interest_id")
-        .inTable("interest");
-    })
-    .createTable("profile_interest", (table) => {
-      table.increments("profile_interest_id").primary();
-      table.integer("profile_id").references("profile_id").inTable("profile");
-      table
-        .integer("interest_id")
+        .unsigned()
         .references("interest_id")
         .inTable("interest");
     })
@@ -76,31 +83,54 @@ exports.up = function (knex) {
       table.text("bio");
       table.timestamp("updated_at").defaultTo(knex.fn.now());
     })
-    .createTable("user_interest", (table) => {
-      table.increments("user_interest_id").primary();
-      table.integer("user_id").references("user_id").inTable("user");
+    .createTable("profile_interest", (table) => {
+      table.increments("profile_interest_id").primary();
+      table
+        .integer("profile_id")
+        .unsigned()
+        .references("profile_id")
+        .inTable("profile");
       table
         .integer("interest_id")
+        .unsigned()
+        .references("interest_id")
+        .inTable("interest");
+    })
+    .createTable("user_interest", (table) => {
+      table.increments("user_interest_id").primary();
+      table.integer("user_id").unsigned().references("user_id").inTable("user");
+      table
+        .integer("interest_id")
+        .unsigned()
         .references("interest_id")
         .inTable("interest");
     })
     .createTable("user_location", (table) => {
       table.increments("user_location_id").primary();
-      table.integer("user_id").references("user_id").inTable("user");
+      table.integer("user_id").unsigned().references("user_id").inTable("user");
       table
         .integer("location_id")
+        .unsigned()
         .references("location_id")
         .inTable("location");
     })
     .createTable("user_event", (table) => {
       table.increments("user_event_id").primary();
-      table.integer("user_id").references("user_id").inTable("user");
-      table.integer("event_id").references("event_id").inTable("event");
+      table.integer("user_id").unsigned().references("user_id").inTable("user");
+      table
+        .integer("event_id")
+        .unsigned()
+        .references("event_id")
+        .inTable("event");
     })
     .createTable("user_profile", (table) => {
       table.increments("user_profile_id").primary();
-      table.integer("user_id").references("user_id").inTable("user");
-      table.integer("profile_id").references("profile_id").inTable("profile");
+      table.integer("user_id").unsigned().references("user_id").inTable("user");
+      table
+        .integer("profile_id")
+        .unsigned()
+        .references("profile_id")
+        .inTable("profile");
     });
 };
 
@@ -110,8 +140,8 @@ exports.up = function (knex) {
  */
 exports.down = function (knex) {
   return knex.schema
+
     .dropTable("profile")
-    .dropTable("location")
     .dropTable("event")
     .dropTable("profile_event")
     .dropTable("interest")
