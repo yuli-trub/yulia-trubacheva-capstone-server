@@ -7,6 +7,8 @@ exports.up = async function (knex) {
     .createTable("location", (table) => {
       table.increments("location_id").primary().unsigned();
       table.string("location_name").notNullable();
+      table.string("location_img_url");
+      table.string("country");
     })
     .createTable("profile", (table) => {
       table.increments("profile_id").primary();
@@ -15,16 +17,11 @@ exports.up = async function (knex) {
       table.integer("age").notNullable();
       table.text("bio").notNullable();
       table.integer("location").unsigned();
-      table.timestamp("start_date").notNullable();
-      table.timestamp("end_date").notNullable();
+      table.date("start_date").notNullable();
+      table.date("end_date").notNullable();
       table.boolean("isFriend").defaultTo(0);
       table.boolean("isSwiped").defaultTo(0);
-      table
-        .foreign("location")
-        .references("location_id")
-        .inTable("location")
-        .onUpdate("CASCADE")
-        .onDelete("CASCADE");
+      table.foreign("location").references("location_id").inTable("location");
     })
     .createTable("event", (table) => {
       table.increments("event_id").primary();
@@ -34,12 +31,9 @@ exports.up = async function (knex) {
       table.integer("location").unsigned();
       table.date("date").notNullable();
       table.boolean("isSaved").defaultTo(0);
-      table
-        .foreign("location")
-        .references("location_id")
-        .inTable("location")
-        .onUpdate("CASCADE")
-        .onDelete("CASCADE");
+      table.foreign("location").references("location_id").inTable("location");
+      // .onUpdate("CASCADE")
+      // .onDelete("CASCADE");
     })
     .createTable("interest", (table) => {
       table.increments("interest_id").primary();
