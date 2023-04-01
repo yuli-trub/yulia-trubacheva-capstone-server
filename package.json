@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server",
     "dev": "nodemon server",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run",
-    "rollback": "knex migrate:rollback"
+    "rollback": "knex migrate:rollback",
+    "all": "knex migrate:rollback && knex migrate:latest && knex seed:run"
   },
   "keywords": [],
   "author": "",
