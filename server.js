@@ -14,12 +14,12 @@ app.use(express.json());
 
 // // ROUTES
 const eventsRoutes = require("./routes/events.js");
-// const interestsRoutes = require("./routes/interests.js");
+const interestsRoutes = require("./routes/interests.js");
 const locationsRoutes = require("./routes/locations.js");
 const profilesRoutes = require("./routes/profiles.js");
 
 app.use("/api/events", eventsRoutes);
-// app.use("/api/interests", interestsRoutes);
+app.use("/api/interests", interestsRoutes);
 app.use("/api/locations", locationsRoutes);
 app.use("/api/profiles", profilesRoutes);
 // app.use("/api/users", usersRoutes);
