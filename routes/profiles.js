@@ -83,7 +83,7 @@ router.get("/:id", async (req, res) => {
     console.log(error);
     res
       .status(500)
-      .json({ error: true, message: `Could not fetch item ${profileId}` });
+      .json({ error: true, message: `Could not fetch profile ${profileId}` });
   }
 });
 
@@ -147,7 +147,7 @@ router.put("/:id", async (req, res) => {
     console.log(error);
     res
       .status(404)
-      .json({ error: true, message: `Could not find inventory item ${invId}` });
+      .json({ error: true, message: `Could not find profile ${invId}` });
   }
 });
 module.exports = router;
