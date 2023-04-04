@@ -13,5 +13,4 @@ const generateRandomNumbers = () => {
 };
 
 const profileInterestArray = Array.from({ length: 100 }, generateRandomNumbers);
-
 console.log(profileInterestArray);
