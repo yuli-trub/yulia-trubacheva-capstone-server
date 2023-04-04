@@ -5,7 +5,7 @@ const knex = require("knex")(require("../knexfile"));
 router.get("/", async (_req, res) => {
   try {
     const locArr = await knex("location").select([
-      "location.location_id as id",
+      "location.id as id",
       "location.location_name as city",
       "location.country as country",
       "location.location_img_url as image",
