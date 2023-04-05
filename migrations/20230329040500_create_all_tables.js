@@ -46,11 +46,11 @@ exports.up = async function (knex) {
     .createTable("user", (table) => {
       table.increments("id").primary();
       table.integer("google_id").notNullable();
-      //   table.string("email").notNullable().unique();
-      //   table.string("password").notNullable();
-      table.string("avatar_url").notNullable();
+      table.string("email").notNullable().unique();
+      table.string("password").notNullable();
       table.string("username").notNullable();
       table.string("name").notNullable();
+      table.string("avatar_url");
       table.integer("age");
       table.text("bio");
       table.timestamp("updated_at").defaultTo(knex.fn.now());

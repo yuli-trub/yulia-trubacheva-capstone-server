@@ -147,7 +147,7 @@ router.put("/:id", async (req, res) => {
     console.log(error);
     res
       .status(404)
-      .json({ error: true, message: `Could not find profile ${invId}` });
+      .json({ error: true, message: `Could not find profile ${profileId}` });
   }
 });
 module.exports = router;

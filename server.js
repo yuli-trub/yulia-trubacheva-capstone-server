@@ -6,7 +6,9 @@ const knex = require("knex")(require("./knexfile.js"));
 const app = express();
 const PORT = process.env.PORT || 5050;
 
+const { FRONTEND_URL } = process.env;
 require("dotenv").config();
+app.use(cors({ origin: FRONTEND_URL }));
 
 app.use(express.json());
 
@@ -17,12 +19,13 @@ const eventsRoutes = require("./routes/events.js");
 const interestsRoutes = require("./routes/interests.js");
 const locationsRoutes = require("./routes/locations.js");
 const profilesRoutes = require("./routes/profiles.js");
+const usersRoutes = require("./routes/users_auth.js");
 
 app.use("/api/events", eventsRoutes);
 app.use("/api/interests", interestsRoutes);
 app.use("/api/locations", locationsRoutes);
 app.use("/api/profiles", profilesRoutes);
-// app.use("/api/users", usersRoutes);
+app.use("/api/users", usersRoutes);
 
 // app.use(
 //   cors({
@@ -31,7 +34,7 @@ app.use("/api/profiles", profilesRoutes);
 //   })
 // );
 
-app.use(cors());
+// app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
