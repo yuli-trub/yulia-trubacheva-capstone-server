@@ -8,7 +8,7 @@ const authorise = require("../middleware/auth");
 
 const SALT_ROUNDS = 8;
 
-router.post("/signup", (req, res) => {
+router.post("/register", (req, res) => {
   const { password } = req.body;
 
   // Encrypt the password the user provided via bcrypt
@@ -74,12 +74,109 @@ router.get("/profile", authorise, async (req, res) => {
     // Query the database for the user by comparing the ID in the JWT token against the ID of the user
     const user = await knex("user").where({ id: req.token.id }).first();
 
+    const events = await knex("event")
+      .select(["event.*"])
+      .from("event")
+      .innerJoin("user_event", "event.id", "user_event.event_id")
+      .where({ "user_event.user_id": req.token.id })
+      .orderBy("event.date", "desc");
+
+    const friends = await knex("profile")
+      .select(["profile.*"])
+      .from("profile")
+      .innerJoin("user_profile", "profile.id", "user_profile.profile_id")
+      .where({ "user_profile.user_id": req.token.id });
+
+    const fullProfile = {
+      user,
+      events,
+      friends,
+    };
+
     // Remove user password before sending it to client side (via the `delete` operator)
     delete user.password;
 
-    res.status(200).json(user);
+    res.status(200).json(fullProfile);
   } catch (error) {
     res.status(500).json({ message: "Can't fetch user profile" });
+  }
+});
+
+router.post("/friends/:id", authorise, async (req, res) => {
+  const profileId = req.params.id;
+
+  try {
+    const user = await knex("user").where({ id: req.token.id }).first();
+    const userId = user.id;
+    const userFriends = await knex("user_profile")
+      .select("*")
+      .where({ user_id: req.token.id });
+
+    const alreadyFriends = userFriends.find(
+      (friend) => friend.profile_id === profileId
+    );
+    if (alreadyFriends) {
+      res.status(400).json("The user is already a friend");
+      return;
+    }
+
+    const newFriend = await knex("user_profile").insert({
+      user_id: userId,
+      profile_id: profileId,
+    });
+
+    res.status(201).json(newFriend);
+  } catch (error) {
+    res.status(500).json({ message: "Could not add new friend to database" });
+  }
+});
+
+router.delete("/friends/:id", authorise, async (req, res) => {
+  const profileId = req.params.id;
+
+  try {
+    const user = await knex("user").where({ id: req.token.id }).first();
+    const userId = user.id;
+    const newFriend = await knex("user_profile")
+      .where({ user_id: userId, profile_id: profileId })
+      .del();
+
+    res.status(201).json(newFriend);
+  } catch (error) {
+    res.status(500).json({ message: "Could not delete friend to database" });
+  }
+});
+
+router.post("/events/:id", authorise, async (req, res) => {
+  const eventId = req.params.id;
+
+  try {
+    const user = await knex("user").where({ id: req.token.id }).first();
+    const userId = user.id;
+    const newEvent = await knex("user_event").insert({
+      user_id: userId,
+      event_id: eventId,
+    });
+
+    res.status(201).json(newEvent);
+  } catch (error) {
+    res.status(500).json({ message: "Could not add new friend to database" });
+  }
+});
+
+router.delete("/events/:id", authorise, async (req, res) => {
+  const eventId = req.params.id;
+
+  try {
+    const user = await knex("user").where({ id: req.token.id }).first();
+    const userId = user.id;
+    const newEvent = await knex("user_event")
+      .where({ user_id: userId, event_id: eventId })
+      .del();
+
+    res.status(201).json(newEvent);
+  } catch (error) {
+    res.status(500).json({ message: "Could not delete event to database" });
   }
 });
 
