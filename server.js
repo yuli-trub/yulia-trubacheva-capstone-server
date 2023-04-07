@@ -2,11 +2,40 @@ const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const knex = require("knex")(require("./knexfile.js"));
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
-
 const { FRONTEND_URL } = process.env;
+
+// Set up Socket.io
+const server = http.createServer(app);
+const io = new Server(server, {
+  cord: {
+    origin: FRONTEND_URL,
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`User connected ${socket.id}`);
+
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log(`User ${socket.id} joined room: ${data}`);
+  });
+
+  socket.on("send_msg", (data) => {
+    console.log(data);
+    socket.to(data.room).emit("receive_msg", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("user disconnecter", socket.id);
+  });
+});
+
 require("dotenv").config();
 app.use(cors({ origin: FRONTEND_URL }));
 
@@ -35,6 +64,10 @@ app.use("/api/users", usersRoutes);
 // );
 
 // app.use(cors());
+
+server.listen(8081, () => {
+  console.log("server running");
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
