@@ -102,20 +102,44 @@ router.get("/profile", authorise, async (req, res) => {
   }
 });
 
+router.get("/friends/:id", authorise, async (req, res) => {
+  const profileId = req.params.id;
+  try {
+    const user = await knex("user").where({ id: req.token.id }).first();
+    const userId = user.id;
+    const existingFriendship = await knex("user_profile")
+      .where(function () {
+        this.where("user_id", userId)
+          .andWhere("profile_id", profileId)
+          .orWhere("user_id", profileId)
+          .andWhere("profile_id", userId);
+      })
+      .first();
+
+    if (!existingFriendship) {
+      return res.status(404).json({ message: "Friendship not found" });
+    }
+    res.status(200).json(existingFriendship);
+  } catch (error) {
+    res.status(500).json({ message: "Can't fetch user friends" });
+  }
+});
+
 router.post("/friends/:id", authorise, async (req, res) => {
   const profileId = req.params.id;
 
   try {
     const user = await knex("user").where({ id: req.token.id }).first();
     const userId = user.id;
-    const userFriends = await knex("user_profile")
-      .select("*")
-      .where({ user_id: req.token.id });
-
-    const alreadyFriends = userFriends.find(
-      (friend) => friend.profile_id === profileId
-    );
-    if (alreadyFriends) {
+    const existingFriendship = await knex("user_profile")
+      .where(function () {
+        this.where("user_id", userId)
+          .andWhere("profile_id", profileId)
+          .orWhere("user_id", profileId)
+          .andWhere("profile_id", userId);
+      })
+      .first();
+    if (existingFriendship) {
       res.status(400).json("The user is already a friend");
       return;
     }
@@ -141,6 +165,11 @@ router.delete("/friends/:id", authorise, async (req, res) => {
       .where({ user_id: userId, profile_id: profileId })
       .del();
 
+    if (newFriend === 0) {
+      res.status(404).json("Friendship not found");
+      return;
+    }
+
     res.status(201).json(newFriend);
   } catch (error) {
     res.status(500).json({ message: "Could not delete friend to database" });
@@ -153,6 +182,20 @@ router.post("/events/:id", authorise, async (req, res) => {
   try {
     const user = await knex("user").where({ id: req.token.id }).first();
     const userId = user.id;
+
+    const userSavedEvents = await knex("user_event")
+      .select("*")
+      .where({ user_id: req.token.id });
+
+    const alreadySavedEvent = userSavedEvents.find(
+      (event) => event.event_id === eventId
+    );
+
+    if (alreadySavedEvent) {
+      res.status(400).json("The event is already saved");
+      return;
+    }
+
     const newEvent = await knex("user_event").insert({
       user_id: userId,
       event_id: eventId,
@@ -174,9 +217,14 @@ router.delete("/events/:id", authorise, async (req, res) => {
       .where({ user_id: userId, event_id: eventId })
       .del();
 
+    if (newEvent === 0) {
+      res.status(404).json("Event not found");
+      return;
+    }
+
     res.status(201).json(newEvent);
   } catch (error) {
-    res.status(500).json({ message: "Could not delete event to database" });
+    res.status(500).json({ message: "Could not delete event from database" });
   }
 });
 
