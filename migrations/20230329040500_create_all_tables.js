@@ -14,13 +14,13 @@ exports.up = async function (knex) {
     })
     .createTable("profile", (table) => {
       table.increments("id").primary();
-      table.string("avatar_url").notNullable();
+      table.string("avatar_url");
       table.string("name").notNullable();
       table.integer("age").notNullable();
-      table.text("bio").notNullable();
+      table.text("bio");
       table.integer("location_id").unsigned();
-      table.date("start_date").notNullable();
-      table.date("end_date").notNullable();
+      table.date("start_date");
+      table.date("end_date");
       table.boolean("isFriend").defaultTo(0);
       table.boolean("isSwiped").defaultTo(0);
       table.foreign("location_id").references("id").inTable("location");

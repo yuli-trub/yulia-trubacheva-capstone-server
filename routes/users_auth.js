@@ -26,6 +26,18 @@ router.post("/register", (req, res) => {
         password: hashedPassword, // but use the hashed password for the password (instead of the plain text password)
       });
 
+      // Retrieve the newly created user from the database
+      // const newUser = await knex("user")
+      //   .where({ email: req.body.email })
+      //   .first();
+
+      // // Insert the user's profile data into the profile table
+      // await knex("profile").insert({
+      //   name: req.body.name,
+      //   age: req.body.age,
+      //   avatar_url: "https://avatars.dicebear.com/api/avataaars/example.svg",
+      // });
+
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({

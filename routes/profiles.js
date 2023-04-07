@@ -18,7 +18,8 @@ router.get("/", async (_req, res) => {
         "profile.isSwiped as isSwiped",
       ])
       .from("profile")
-      .join("location", "profile.location_id", "location.id");
+      .join("location", "profile.location_id", "location.id")
+      .limit(50);
 
     res.json(locArr);
   } catch {
