@@ -86,4 +86,30 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  const { location } = req.query;
+  try {
+    const eventArr = await knex("event")
+      .select([
+        "event.id as id",
+        "event.event_img_url as image",
+        "event.name as name",
+        "event.description as description",
+        "location.location_name as location",
+        "event.date as date",
+        "event.isSaved as isSaved",
+      ])
+      .from("event")
+      .join("location", "location.id", "event.location_id")
+      .where("event.location", location);
+
+    res.json(eventArr);
+  } catch {
+    res.status(500).json({
+      error: true,
+      message: "Could not fetch events from database",
+    });
+  }
+});
+
 module.exports = router;
