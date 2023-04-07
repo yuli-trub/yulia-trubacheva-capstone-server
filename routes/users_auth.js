@@ -133,10 +133,9 @@ router.post("/friends/:id", authorise, async (req, res) => {
     const userId = user.id;
     const existingFriendship = await knex("user_profile")
       .where(function () {
-        this.where("user_id", userId)
-          .andWhere("profile_id", profileId)
-          .orWhere("user_id", profileId)
-          .andWhere("profile_id", userId);
+        this.where("user_id", userId).andWhere("profile_id", profileId);
+        // .orWhere("user_id", profileId)
+        // .andWhere("profile_id", userId);
       })
       .first();
     if (existingFriendship) {
@@ -155,7 +154,7 @@ router.post("/friends/:id", authorise, async (req, res) => {
   }
 });
 
-router.delete("/friends/:id", authorise, async (req, res) => {
+router.delete("/profiles/:id", authorise, async (req, res) => {
   const profileId = req.params.id;
 
   try {
