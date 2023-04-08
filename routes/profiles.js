@@ -151,4 +151,19 @@ router.put("/:id", async (req, res) => {
       .json({ error: true, message: `Could not find profile ${profileId}` });
   }
 });
+
+router.post("/resetColumn", async (req, res) => {
+  const { isSwiped, isFriend } = req.body;
+
+  try {
+    await knex("profile").update({ isSwiped: false, isFriend: false });
+
+    res.send("Column reset successfully");
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ error: true, message: `Error resetting the column` });
+  }
+});
 module.exports = router;
