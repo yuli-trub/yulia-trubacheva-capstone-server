@@ -87,8 +87,17 @@ router.get("/profile", authorise, async (req, res) => {
     const user = await knex("user").where({ id: req.token.id }).first();
 
     const events = await knex("event")
-      .select(["event.*"])
+      .select([
+        "event.id as id",
+        "event.event_img_url as image",
+        "event.name as name",
+        "event.description as description",
+        "location.location_name as location",
+        "event.date as date",
+        "event.isSaved as isSaved",
+      ])
       .from("event")
+      .join("location", "location.id", "event.location_id")
       .innerJoin("user_event", "event.id", "user_event.event_id")
       .where({ "user_event.user_id": req.token.id })
       .orderBy("event.date", "desc");
@@ -121,10 +130,7 @@ router.get("/friends/:id", authorise, async (req, res) => {
     const userId = user.id;
     const existingFriendship = await knex("user_profile")
       .where(function () {
-        this.where("user_id", userId)
-          .andWhere("profile_id", profileId)
-          .orWhere("user_id", profileId)
-          .andWhere("profile_id", userId);
+        this.where("user_id", userId).andWhere("profile_id", profileId);
       })
       .first();
 
