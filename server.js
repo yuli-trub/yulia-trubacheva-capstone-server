@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 const app = express();
 const PORT = process.env.PORT || 5050;
 const { FRONTEND_URL } = process.env;
+const CHAT_PORT = process.env.CHAT_PORT || 8081;
 
 // Set up Socket.io
 const server = http.createServer(app);
@@ -56,17 +57,8 @@ app.use("/api/locations", locationsRoutes);
 app.use("/api/profiles", profilesRoutes);
 app.use("/api/users", usersRoutes);
 
-// app.use(
-//   cors({
-//     origin: true,
-//     credentials: true,
-//   })
-// );
-
-// app.use(cors());
-
-server.listen(8081, () => {
-  console.log("server running");
+server.listen(CHAT_PORT, () => {
+  console.log(`Chat server is running on port ${CHAT_PORT}`);
 });
 
 app.listen(PORT, () => {
