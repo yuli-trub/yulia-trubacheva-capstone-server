@@ -27,16 +27,18 @@ router.post("/register", (req, res) => {
       });
 
       // Retrieve the newly created user from the database
-      // const newUser = await knex("user")
-      //   .where({ email: req.body.email })
-      //   .first();
+      const newUser = await knex("user")
+        .where({ email: req.body.email })
+        .first();
 
-      // // Insert the user's profile data into the profile table
-      // await knex("profile").insert({
-      //   name: req.body.name,
-      //   age: req.body.age,
-      //   avatar_url: "https://avatars.dicebear.com/api/avataaars/example.svg",
-      // });
+      // Insert the user's profile data into the profile table
+      await knex("profile").insert({
+        name: req.body.name,
+        age: req.body.age,
+        avatar_url: req.body.avatar_url,
+        location_id: req.body.location_id,
+        user_id: newUser.id,
+      });
 
       res.json({ success: true });
     } catch (error) {
@@ -84,7 +86,11 @@ router.post("/login", async (req, res) => {
 router.get("/profile", authorise, async (req, res) => {
   try {
     // Query the database for the user by comparing the ID in the JWT token against the ID of the user
-    const user = await knex("user").where({ id: req.token.id }).first();
+    const user = await knex("user")
+      .select("user.*", "location.location_name as location_name")
+      .leftJoin("location", "user.location_id", "location.id")
+      .where({ "user.id": req.token.id })
+      .first();
 
     const events = await knex("event")
       .select([

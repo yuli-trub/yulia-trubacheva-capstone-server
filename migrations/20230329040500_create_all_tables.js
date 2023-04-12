@@ -12,6 +12,19 @@ exports.up = async function (knex) {
       table.string("location_img_url");
       table.string("country");
     })
+    .createTable("user", (table) => {
+      table.increments("id").primary();
+      table.integer("google_id");
+      table.string("email").notNullable().unique();
+      table.string("password").notNullable();
+      table.string("name").notNullable();
+      table.string("avatar_url");
+      table.integer("location_id").unsigned();
+      table.integer("age");
+      table.text("bio");
+      table.timestamp("updated_at").defaultTo(knex.fn.now());
+      table.foreign("location_id").references("id").inTable("location");
+    })
     .createTable("profile", (table) => {
       table.increments("id").primary();
       table.string("avatar_url");
@@ -23,7 +36,13 @@ exports.up = async function (knex) {
       table.date("end_date");
       table.boolean("isFriend").defaultTo(0);
       table.boolean("isSwiped").defaultTo(0);
-      table.foreign("location_id").references("id").inTable("location");
+      table
+        .foreign("location_id")
+        .references("id")
+        .inTable("location")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
+      table.integer("user_id").unsigned().references("id").inTable("user");
     })
     .createTable("event", (table) => {
       // Name of field is just id
@@ -35,24 +54,16 @@ exports.up = async function (knex) {
       table.date("date").notNullable();
       table.boolean("isSaved").defaultTo(0);
       // Should be location_id
-      table.foreign("location_id").references("id").inTable("location");
-      // .onUpdate("CASCADE")
-      // .onDelete("CASCADE");
+      table
+        .foreign("location_id")
+        .references("id")
+        .inTable("location")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
     })
     .createTable("interest", (table) => {
       table.increments("id").primary();
       table.string("interest_name").notNullable();
-    })
-    .createTable("user", (table) => {
-      table.increments("id").primary();
-      table.integer("google_id");
-      table.string("email").notNullable().unique();
-      table.string("password").notNullable();
-      table.string("name").notNullable();
-      table.string("avatar_url");
-      table.integer("age");
-      table.text("bio");
-      table.timestamp("updated_at").defaultTo(knex.fn.now());
     })
     .createTable("event_interest", (table) => {
       table.integer("event_id").unsigned().references("id").inTable("event");
@@ -125,9 +136,9 @@ exports.down = function (knex) {
     .dropTable("profile_interest")
     .dropTable("profile_event")
     .dropTable("event_interest")
-    .dropTable("user")
     .dropTable("interest")
     .dropTable("event")
     .dropTable("profile")
+    .dropTable("user")
     .dropTable("location");
 };

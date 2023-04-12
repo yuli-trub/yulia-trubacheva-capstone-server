@@ -156,7 +156,7 @@ router.post("/resetColumn", async (req, res) => {
   const { isSwiped, isFriend } = req.body;
 
   try {
-    await knex("profile").update({ isSwiped: false, isFriend: false });
+    await knex("profile").update({ isSwiped: false });
 
     res.send("Column reset successfully");
   } catch (error) {
