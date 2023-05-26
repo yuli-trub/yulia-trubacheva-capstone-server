@@ -26,7 +26,7 @@ exports.up = async function (knex) {
       table.foreign("location_id").references("id").inTable("location");
     })
     .createTable("profile", (table) => {
-      table.increments('id').primary()
+      table.increments("id").primary();
       table.string("avatar_url");
       table.string("name").notNullable();
       table.integer("age").notNullable();
@@ -42,8 +42,13 @@ exports.up = async function (knex) {
         .inTable("location")
         .onUpdate("CASCADE")
         .onDelete("CASCADE");
-      table.integer("user_id").unsigned().references("id").inTable("user").onUpdate("CASCADE")
-      .onDelete("CASCADE");
+      table
+        .integer("user_id")
+        .unsigned()
+        .references("id")
+        .inTable("user")
+        .onUpdate("CASCADE")
+        .onDelete("CASCADE");
     })
     .createTable("event", (table) => {
       // Name of field is just id

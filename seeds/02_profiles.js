@@ -406,5 +406,8 @@ exports.seed = async function (knex) {
       isFriend: 0,
       isSwiped: 0,
     },
-  ]);
+  ])
+  await knex.raw(`
+  SELECT setval('profile_id_seq', (SELECT MAX(id) FROM profile) + 1);
+`);
 };
