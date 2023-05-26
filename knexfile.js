@@ -5,13 +5,13 @@ require("dotenv").config();
  * @type { Object.<string, import("knex").Knex.Config> }
  */
 module.exports = {
-  client: "mysql2",
+  client: "postgresql",
   connection: {
-    host: "127.0.0.1",
+    // host: "127.0.0.1",
     database: process.env.DB_LOCAL_DBNAME,
-    user: process.env.DB_LOCAL_USER,
+    user: "postgres",
     password: process.env.DB_LOCAL_PASSWORD,
-    port: process.env.DB_LOCAL_PORT,
+    // port: process.env.DB_LOCAL_PORT,
   },
 };
 
