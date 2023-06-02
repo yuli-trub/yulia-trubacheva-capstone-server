@@ -15,7 +15,8 @@ router.get("/", async (_req, res) => {
         "event.isSaved as isSaved",
       ])
       .from("event")
-      .join("location", "location.id", "event.location_id");
+      .join("location", "location.id", "event.location_id")
+      .groupBy("event.id", "location.location_name")
 
     res.json(eventArr);
   } catch {
@@ -43,13 +44,13 @@ router.get("/:id", async (req, res) => {
       .from("event")
       .join("location", "event.location_id", "location.id")
       .where({ "event.id": eventId })
-      .groupBy("event.id");
+      .groupBy("event.id", 'location.location_name');
     res.json(event);
   } catch (error) {
     console.log(error);
     res
       .status(500)
-      .json({ error: true, message: `Could not fetch event ${profileId}` });
+      .json({ error: true, message: `Could not fetch event ${eventId}` });
   }
 });
 
@@ -75,7 +76,7 @@ router.put("/:id", async (req, res) => {
       .from("event")
       .join("location", "event.location_id", "location.id")
       .where({ "event.id": eventId })
-      .groupBy("event.id");
+      .groupBy("event.id", 'location.location_name');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -101,7 +102,8 @@ router.get("/", async (req, res) => {
       ])
       .from("event")
       .join("location", "location.id", "event.location_id")
-      .where("event.location", location);
+      .where("event.location", location)
+      .groupBy("event.id", 'location.location_name');
 
     res.json(eventArr);
   } catch {

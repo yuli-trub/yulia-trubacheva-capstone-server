@@ -19,7 +19,8 @@ router.get("/", async (_req, res) => {
       ])
       .from("profile")
       .join("location", "profile.location_id", "location.id")
-      .limit(50);
+      .limit(50)
+      .groupBy("profile.id", "location.location_name");
 
     res.json(locArr);
   } catch {
@@ -50,7 +51,7 @@ router.get("/:id", async (req, res) => {
       .from("profile")
       .join("location", "profile.location_id", "location.id")
       .where({ "profile.id": profileId })
-      .groupBy("profile.id");
+      .groupBy("profile.id", "location.location_name");
 
     const events = await knex("event")
       .select(["event.*"])
@@ -114,7 +115,7 @@ router.put("/:id", async (req, res) => {
       .from("profile")
       .join("location", "profile.location_id", "location.id")
       .where({ "profile.id": profileId })
-      .groupBy("profile.id");
+      .groupBy("profile.id", "location.location_name");
 
     const events = await knex("event")
       .select(["event.*"])
