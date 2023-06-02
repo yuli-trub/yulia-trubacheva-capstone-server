@@ -7,11 +7,11 @@ require("dotenv").config();
 module.exports = {
   client: "postgresql",
   connection: {
-    // host: "127.0.0.1",
+    host: process.env.DB_HOST,
     database: process.env.DB_LOCAL_DBNAME,
     user: "postgres",
     password: process.env.DB_LOCAL_PASSWORD,
-    // port: process.env.DB_LOCAL_PORT,
+    port: process.env.DB_LOCAL_PORT
   },
 };
 
