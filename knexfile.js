@@ -11,7 +11,8 @@ module.exports = {
     database: process.env.DB_LOCAL_DBNAME,
     user: "postgres",
     password: process.env.DB_LOCAL_PASSWORD,
-    port: process.env.DB_LOCAL_PORT
+    port: process.env.DB_LOCAL_PORT,
+    ssl: true
   },
 };
 
