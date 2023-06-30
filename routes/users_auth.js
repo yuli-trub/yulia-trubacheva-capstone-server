@@ -32,10 +32,17 @@ router.post("/register", (req, res) => {
         .first();
 
       // Insert the user's profile data into the profile table
-      await knex("profile").insert({
+     const newProfile =  await knex("profile").insert({
         name: req.body.name,
         age: req.body.age,
         avatar_url: req.body.avatar_url,
+        location_id: req.body.location_id,
+        user_id: newUser.id,
+      });
+
+
+      // Location intermediate table
+      const newLocation = await knex("user_location").insert({
         location_id: req.body.location_id,
         user_id: newUser.id,
       });
@@ -92,6 +99,18 @@ router.get("/profile", authorise, async (req, res) => {
       .where({ "user.id": req.token.id })
       .first();
 
+    const profile = await knex("user_profile")
+      .select("user_profile.profile_id as profile")
+      .where({ "user_profile.user_id": req.token.id })
+      .first();
+
+    if (profile) {
+      const profileId = profile.profile;
+      console.log(profileId);
+    } else {
+      console.log("Profile not found");
+    }
+
     const events = await knex("event")
       .select([
         "event.id as id",
@@ -118,6 +137,7 @@ router.get("/profile", authorise, async (req, res) => {
       user,
       events,
       friends,
+      profile,
     };
 
     // Remove user password before sending it to client side (via the `delete` operator)

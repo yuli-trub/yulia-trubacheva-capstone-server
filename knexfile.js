@@ -11,8 +11,8 @@ module.exports = {
     database: process.env.DB_LOCAL_DBNAME,
     user: process.env.DB_LOCAL_USER,
     password: process.env.DB_LOCAL_PASSWORD,
-    port: process.env.DB_LOCAL_PORT,
-    ssl: true
+    port: process.env.DB_LOCAL_PORT
+    // ssl: true
   },
 };
 
